@@ -2,13 +2,6 @@ import { E6,IAccountConfiguration, IChainConfiguration, GenerateFee} from "./com
 
 import { cosmosclient, rest, proto } from 'cosmos-client';
 import { AccAddress } from 'cosmos-client/cjs/types';
-
-interface IClientInfos {
-    rest : cosmosclient.CosmosSDK,
-    rpc : SigningStargateClient,
-    restAddress: AccAddress
-  }
-
 import {
     QueryClient, setupGovExtension, setupBankExtension, SigningStargateClient, BankExtension, GovExtension
 
@@ -20,10 +13,6 @@ import { setBech32NetworkPrefix } from 'cosmos-client/esm/types/address/config'
 
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { coins, Secp256k1HdWallet } from '@cosmjs/launchpad'
-import dotenv from 'dotenv';
-import { InlineResponse20035BlockEvidenceLightClientAttackEvidenceConflictingBlockSignedHeaderCommitSignaturesBlockIdFlagEnum } from "cosmos-client/cjs/openapi/api";
-// import { chainMap } from "./assets/chains.js";
-dotenv.config();
 
 const statusVoting = 2; //Voting Period
 
@@ -32,6 +21,18 @@ const VOTE_OPTION_YES = 1; //YES
 const VOTE_OPTION_ABSTAIN = 2;//abstain
 const VOTE_OPTION_NO = 3;//NO
 const VOTE_OPTION_NO_WITH_VETO = 4;//No with veto
+
+interface IClientInfos {
+    rest : cosmosclient.CosmosSDK,
+    rpc : SigningStargateClient,
+    restAddress: AccAddress
+  }
+
+
+const chainConfigs = require('./chainConfigs.json') as IChainConfiguration[];
+
+const accountConfigs = require('./accountConfigs.json') as IAccountConfiguration[];
+
 
 async function getQueryClient(rpcEndpoint:string) {
     const tendermint34Client = await Tendermint34Client.connect(rpcEndpoint);
@@ -104,7 +105,7 @@ async function start(accountConfig :IAccountConfiguration, config: IChainConfigu
     const stakingBalance = TokenStakeAmounts[accountConfig.accountName + "_" + config.tokenDenom];
     
     if (stakingBalance / E6 > 1) {
-        console.log(accountConfig.accountName + "_" + config.tokenDenom + String(stakingBalance));
+        console.log(accountConfig.accountName + "_" + config.tokenDenom + "_" + String(stakingBalance));
 
         const proposalsVoting = await queryClient.gov.proposals(statusVoting, "", "");
         // console.log(proposalsVoting);
@@ -137,9 +138,6 @@ async function start(accountConfig :IAccountConfiguration, config: IChainConfigu
 //     }
 // }
 
-const chainConfigs = require('./chainConfigs.json') as IChainConfiguration[];
-
-const accountConfigs = require('./accountConfigs_test.json') as IAccountConfiguration[];
 
 const TokenStakeAmounts : Record<string, number> = {};
 

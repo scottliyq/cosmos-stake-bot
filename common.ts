@@ -25,10 +25,7 @@ export interface IChainConfiguration{
     customDerivationPath? : string
   }
 
-// export interface ITokenInfo{
-//   denom: string,
-//   amount: Number
-// }
+  
 export function GenerateFee( config : IChainConfiguration ){
     let fee = "7000";
     if(config.tokenDenom == "uosmo"){
